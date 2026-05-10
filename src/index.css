@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Estilos globais para garantir o visual limpo */
 body {
+  @apply bg-gray-100 text-gray-900;
   margin: 0;
   font-family: sans-serif;
-  background-color: #f3f4f6;
 }
