@@ -1,24 +1,35 @@
 import React, { useState } from 'react';
 import CadastroEvento from './components/CadastroEvento';
 import NominataLocutor from './components/NominataLocutor';
-import CheckInMilitar from './components/CheckInMilitar';
+
+// Para teste, usaremos um ID de evento fixo que você criou no Supabase
+const EVENTO_ID_TESTE = "COLE_AQUI_O_ID_DO_EVENTO_DO_SUPABASE";
 
 function App() {
-  const [telaAtiva, setTelaAtiva] = useState('cadastro');
-  const [eventoSelecionado, setEventoSelecionado] = useState(null);
+  const [aba, setAba] = useState('cadastro');
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-navy-900 text-white p-4 flex gap-4 shadow-lg">
-        <button onClick={() => setTelaAtiva('cadastro')} className="hover:text-yellow-500">Novo Evento</button>
-        <button onClick={() => setTelaAtiva('checkin')} className="hover:text-yellow-500">Check-in Militar</button>
-        <button onClick={() => setTelaAtiva('nominata')} className="hover:text-yellow-500">Nominata Real-time</button>
+      {/* Menu Superior Militar */}
+      <nav className="bg-navy-900 bg-[#002147] text-white p-4 shadow-lg flex justify-between">
+        <span className="font-bold">COM4ºDN - Sistema de Eventos</span>
+        <div className="space-x-4">
+          <button onClick={() => setAba('cadastro')} className={`hover:text-yellow-500 ${aba === 'cadastro' ? 'text-yellow-500' : ''}`}>Organização</button>
+          <button onClick={() => setAba('checkin')} className={`hover:text-yellow-500 ${aba === 'checkin' ? 'text-yellow-500' : ''}`}>Posto de Controle</button>
+          <button onClick={() => setAba('nominata')} className={`hover:text-yellow-500 ${aba === 'nominata' ? 'text-yellow-500' : ''}`}>Nominata</button>
+        </div>
       </nav>
 
-      <main className="p-6">
-        {telaAtiva === 'cadastro' && <CadastroEvento />}
-        {telaAtiva === 'checkin' && <CheckInMilitar setEvento={setEventoSelecionado} />}
-        {telaAtiva === 'nominata' && <NominataLocutor eventoId={eventoSelecionado} />}
+      {/* Conteúdo Dinâmico */}
+      <main className="container mx-auto p-6">
+        {aba === 'cadastro' && <CadastroEvento />}
+        {aba === 'nominata' && <NominataLocutor eventoId={EVENTO_ID_TESTE} />}
+        {aba === 'checkin' && (
+          <div className="p-10 bg-white rounded shadow text-center">
+            <h2 className="text-xl font-bold">Módulo de Check-in</h2>
+            <p>Em desenvolvimento: Aqui o militar confirmará a presença.</p>
+          </div>
+        )}
       </main>
     </div>
   );
