@@ -1,38 +1,50 @@
-import React, { useState } from 'react';
-import CadastroEvento from './components/CadastroEvento';
-import NominataLocutor from './components/NominataLocutor';
+import { useEffect, useState } from 'react';
+import { supabase } from './lib/supabaseClient';
+import FormularioPessoa from './components/FormularioPessoa';
 
-// Para teste, usaremos um ID de evento fixo que você criou no Supabase
-const EVENTO_ID_TESTE = "COLE_AQUI_O_ID_DO_EVENTO_DO_SUPABASE";
+export default function App() {
+  const [eventos, setEventos] = useState([]);
 
-function App() {
-  const [aba, setAba] = useState('cadastro');
+  useEffect(() => {
+    fetchEventos();
+  }, []);
+
+  async function fetchEventos() {
+    const { data } = await supabase
+      .from('eventos')
+      .select('*, locais(nome), uniformes(sigla)')
+      .order('data_hora', { ascending: true });
+    setEventos(data || []);
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Menu Superior Militar */}
-      <nav className="bg-navy-900 bg-[#002147] text-white p-4 shadow-lg flex justify-between">
-        <span className="font-bold">COM4ºDN - Sistema de Eventos</span>
-        <div className="space-x-4">
-          <button onClick={() => setAba('cadastro')} className={`hover:text-yellow-500 ${aba === 'cadastro' ? 'text-yellow-500' : ''}`}>Organização</button>
-          <button onClick={() => setAba('checkin')} className={`hover:text-yellow-500 ${aba === 'checkin' ? 'text-yellow-500' : ''}`}>Posto de Controle</button>
-          <button onClick={() => setAba('nominata')} className={`hover:text-yellow-500 ${aba === 'nominata' ? 'text-yellow-500' : ''}`}>Nominata</button>
-        </div>
-      </nav>
+    <div className="min-h-screen p-8">
+      <header className="flex justify-between items-center mb-10 border-b-4 border-[#002147] pb-4">
+        <h1 className="text-3xl font-extrabold text-[#002147]">Eventos Com4ºDN</h1>
+        <button className="btn-primary">+ Novo Evento</button>
+      </header>
 
-      {/* Conteúdo Dinâmico */}
-      <main className="container mx-auto p-6">
-        {aba === 'cadastro' && <CadastroEvento />}
-        {aba === 'nominata' && <NominataLocutor eventoId={EVENTO_ID_TESTE} />}
-        {aba === 'checkin' && (
-          <div className="p-10 bg-white rounded shadow text-center">
-            <h2 className="text-xl font-bold">Módulo de Check-in</h2>
-            <p>Em desenvolvimento: Aqui o militar confirmará a presença.</p>
-          </div>
-        )}
+      <main className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Lado Esquerdo: Lista de Eventos (Read) */}
+        <section>
+          <h2 className="text-xl font-bold mb-4">Eventos Planejados</h2>
+          {eventos.map(evento => (
+            <div key={evento.id} className="bg-white p-4 mb-4 rounded shadow border-l-8 border-yellow-500">
+              <h3 className="font-bold text-lg">{evento.titulo}</h3>
+              <p className="text-gray-600">{new Date(evento.data_hora).toLocaleString('pt-BR')}</p>
+              <p className="text-sm font-semibold">Local: {evento.locais?.nome}</p>
+              <span className="inline-block mt-2 px-2 py-1 bg-gray-200 text-xs rounded">
+                Uniforme: {evento.uniformes?.sigla}
+              </span>
+            </div>
+          ))}
+        </section>
+
+        {/* Lado Direito: Cadastro (Create) */}
+        <section>
+          <FormularioPessoa />
+        </section>
       </main>
     </div>
   );
 }
-
-export default App;
