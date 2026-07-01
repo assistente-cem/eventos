@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-PT" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Comando do 4º Distrito Naval — Visitas Programadas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter para textos e Montserrat para títulos e datas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para ícones navais e de ficheiros -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f4fa',
+                            100: '#dbe5f5',
+                            200: '#bdcfea',
+                            300: '#90b2dc',
+                            900: '#0c1c38', // Azul Marinho Oficial da Marinha
+                            950: '#060e1c'
+                        },
+                        militar: {
+                            yellow: '#F5C518', // Amarelo de alto contraste
+                            yellowLight: '#FEF9C3',
+                            border: '#E2E8F0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Montserrat', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'premium': '0 4px 20px -2px rgba(12, 28, 56, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
+                        'premium-hover': '0 10px 30px -4px rgba(12, 28, 56, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-display {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .transition-max-height {
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-full bg-[#F8FAFC] text-slate-800 antialiased pb-12">
+
+    <!-- CABEÇALHO COM ESPAÇO PARA IMAGEM PNG PROPORCIONAL -->
+    <header class="sticky top-0 z-40 bg-white border-b border-slate-100 px-6 py-4 shadow-sm">
+        <div class="max-w-md mx-auto flex items-center justify-between gap-4">
+            <div class="min-w-0 flex-grow">
+                <h1 class="font-display font-extrabold text-base tracking-tight text-navy-900 leading-tight">
+                    Comando do 4º Distrito Naval
+                </h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-500 font-extrabold mt-1">
+                    Guardião do Portal da Amazónia
+                </p>
+            </div>
+            
+            <!-- ESPAÇO PARA IMAGEM PNG PROPORCIONAL AO TÍTULO -->
+            <div class="shrink-0">
+                <!-- Substitua o "src" pelo seu ficheiro local "brasao-4dn.png" -->
+                <img id="brasaoImg" src="brasao-4dn.png" 
+                     onerror="showFallbackIcon()" 
+                     alt="Brasão Com4ºDN" 
+                     class="w-14 h-14 object-contain transition-all duration-200" />
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTAINER CENTRAL -->
+    <main class="flex-grow w-full max-w-md mx-auto px-4 py-6 flex flex-col gap-6">
+        
+        <!-- BANNER INFORMATIVO -->
+        <section class="bg-white rounded-2xl border border-slate-100 p-6 shadow-premium relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-navy-900"></div>
+            <h2 class="font-display font-bold text-base text-navy-900 mb-1">Visitas programadas</h2>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Acompanhe o cronograma de inspeções, logística de transporte e o detalhamento operacional das comitivas nas Organizações Militares subordinadas ao <strong class="text-navy-900 font-semibold">Com4ºDN</strong>.
+            </p>
+        </section>
+
+        <!-- SECÇÃO DE FILTROS E ORDENAÇÃO -->
+        <section class="flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Cronograma Oficial</span>
+                
+                <!-- Alternador de Ordem Cronológica -->
+                <button onclick="toggleSorting()" id="sortBtn" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold shadow-sm transition-all duration-150 active:scale-95 focus:outline-none">
+                    <i id="sortIcon" class="fa-solid fa-arrow-down-short-wide text-militar-yellow"></i>
+                    <span id="sortLabel">Mais Próximos Primeiro</span>
+                </button>
+            </div>
+
+            <!-- Campo de Pesquisa -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterEvents()" placeholder="Procurar por Organização Militar ou Autoridade..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 focus:border-navy-900 rounded-xl text-xs placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-navy-900/10 transition-all duration-150 shadow-sm">
+            </div>
+        </section>
+
+        <!-- LISTAGEM VERTICAL DE EVENTOS -->
+        <section class="relative flex flex-col gap-4 pl-2 border-l border-slate-200" id="eventsContainer">
+            <!-- Eventos gerados dinamicamente via JavaScript -->
+        </section>
+
+    </main>
+
+    <!-- RODAPÉ EXCLUSIVO SOLICITADO -->
+    <footer class="w-full text-center py-8 border-t border-slate-100 mt-auto bg-white">
+        <p class="text-xs text-slate-600 font-semibold px-4">
+            Marinha do Brasil — Protegendo nossas riquezas, cuidando da nossa gente.
+        </p>
+    </footer>
+
+    <!-- MODAL "PROGRAMA DE EVENTOS" -->
+    <div id="programModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white border border-slate-100 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl transition-all duration-300 transform scale-95" id="programContent">
+            <!-- Cabeçalho do Modal -->
+            <div class="bg-slate-50 px-5 py-4 border-b border-slate-150 flex items-center justify-between">
+                <h3 class="font-display font-bold text-sm tracking-wide text-navy-900">Programa de Eventos</h3>
+                <button onclick="toggleProgramModal()" class="w-8 h-8 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition-colors focus:outline-none">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            
+            <!-- Conteúdo do Modal -->
+            <div class="p-6 flex flex-col gap-4" id="modalBody">
+                <!-- Injetado dinamicamente -->
+            </div>
+
+            <!-- Rodapé do Modal -->
+            <div class="px-5 py-4 bg-slate-50 border-t border-slate-150 flex items-center justify-end gap-2">
+                <button onclick="copyModalContent()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-navy-900 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 focus:outline-none">
+                    <i class="fa-solid fa-copy"></i> Copiar Texto
+                </button>
+                <button onclick="toggleProgramModal()" class="px-4 py-2 bg-navy-900 hover:bg-navy-800 text-white font-bold text-xs rounded-xl transition-colors shadow-sm focus:outline-none">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICAÇÕES (MICRO-TOAST) -->
+    <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-xs pointer-events-none">
+        <!-- Toasts dinâmicos -->
+    </div>
+
+    <!-- SCRIPT DE LOGICA E DADOS -->
+    <script>
+        // Dados estruturados oficiais das comitivas
+        const originalSchedule = [
+            {
+                id: "e1",
+                dateStart: "2026-07-28",
+                dateEnd: "2026-07-28",
+                dateFormatted: "28 JUL 2026",
+                title: "Incorporação do NAsH Anna Nery",
+                authorities: ["CEMA", "DGMM"],
+                omInvolved: ["Com4ºDN", "ComGptPatNavN", "2ºBtlOpRib", "CHN-4"],
+                details: "O DGMM chega no dia 26JUL e no dia 27JUL visitará o 2BtlOpRib (Obras), BNVC (Dique seco, obras no píer, Navios do GNN e do CHN) e Com4DN (Auditório Portal da Amazônia)."
+            },
+            {
+                id: "e2",
+                dateStart: "2026-08-04",
+                dateEnd: "2026-08-06",
+                dateFormatted: "04 a 06 AGO 2026",
+                title: "Visitec DSM",
+                authorities: ["DSM"],
+                omInvolved: ["Com4ºDN", "HNBe"],
+                details: "Visita programada à Unidade Médica de Intervenção (UMI) e ao Hospital Naval de Belém (HNBe) para avaliação técnica de infraestrutura médica."
+            },
+            {
+                id: "e3",
+                dateStart: "2026-08-04",
+                dateEnd: "2026-08-06",
+                dateFormatted: "04 a 06 AGO 2026",
+                title: "Visitec SGM",
+                authorities: ["SGM"],
+                omInvolved: ["Com4ºDN", "CeIMBe", "BNVC", "2ºBtlOpRib", "CHN-4"],
+                details: "Visita de inspeção técnica às instalações do Centro de Intendência da Marinha em Belém (CeIMBe) e Base Naval de Val-de-Cães (BNVC)."
+            },
+            {
+                id: "e4",
+                dateStart: "2026-08-24",
+                dateEnd: "2026-09-01",
+                dateFormatted: "24 AGO a 01 SET 2026",
+                title: "IAM Com4DN",
+                authorities: ["CON"],
+                omInvolved: ["Com4ºDN", "HNBe", "ComGptPatNavN", "CeIMBe", "CIABA", "CFS", "CPAP", "CPMA", "CPPI", "CPAOR", "2ºBtlOpRib", "CHN-4", "EsqdHU-41"],
+                details: "Visita a TODAS as OM da área Belém, além da CFS e CPAP (ASC). O detalhamento da visita será encaminhado em breve por Memorando. Os deslocamentos a CFS e CPAP serão com ANV UH-15. Faremos uma demonstração operativa ribeirinha a bordo do NA Pará e visita ao Anna Nery e Sgt Lima. Avaliação de realização do evento de celebração dos 150 anos do Edifício do Com4DN no dia 26 ou 27AGO."
+            },
+            {
+                id: "e5",
+                dateStart: "2026-09-10",
+                dateEnd: "2026-09-15",
+                dateFormatted: "SETEMBRO 2026 (VAP)",
+                authorities: ["COMGER"],
+                omInvolved: ["Com4ºDN", "ComGptPatNavN", "2ºBtlOpRib", "CFS", "NA Pará"],
+                details: "Visita programada à CFS e atividades operacionais intensivas no 2º Batalhão de Operações Ribeirinhas. Atividades: corrida integrada com a tripulação, demonstração de Desembarque Ribeirinho com o NA Pará e visita à área de instrução prática Dr. Guataçara (ASC)."
+            }
+        ];
+
+        let schedule = [...originalSchedule];
+        let ascendingOrder = true; 
+        let openCardId = null;
+        let selectedEventForModal = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderEvents();
+        });
+
+        // Fallback gráfico caso a imagem PNG local não seja encontrada no servidor
+        function showFallbackIcon() {
+            const container = document.getElementById('brasaoImg').parentElement;
+            container.innerHTML = `
+                <div class="w-14 h-14 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-navy-900 shadow-sm" title="Insira brasao-4dn.png">
+                    <i class="fa-solid fa-anchor text-xl text-militar-yellow"></i>
+                </div>
+            `;
+        }
+
+        function sortEvents() {
+            schedule.sort((a, b) => {
+                const dateA = new Date(a.dateStart);
+                const dateB = new Date(b.dateStart);
+                return ascendingOrder ? dateA - dateB : dateB - dateA;
+            });
+        }
+
+        // Renderização dos cards de Itinerário empilhados
+        function renderEvents() {
+            sortEvents();
+            const container = document.getElementById('eventsContainer');
+            container.innerHTML = '';
+
+            if (schedule.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-white border border-slate-100 rounded-2xl p-6 shadow-premium">
+                        <p class="text-slate-400 text-xs font-semibold">Nenhuma visita oficial encontrada.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            schedule.forEach(event => {
+                const isExpanded = openCardId === event.id;
+                
+                // Organizações Militares Co-responsáveis
+                const omTags = event.omInvolved.map(om => `
+                    <span class="inline-flex text-[9px] font-bold px-2 py-0.5 rounded bg-navy-50 text-navy-800 border border-navy-100">${om}</span>
+                `).join('');
+
+                // Autoridades estruturadas individualmente em bullets
+                const authoritiesList = event.authorities.map(auth => `
+                    <li class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-militar-yellow shrink-0"></span>
+                        <span class="font-bold text-navy-900">${auth}</span>
+                    </li>
+                `).join('');
+
+                const eventCard = document.createElement('div');
+                eventCard.className = `group relative rounded-2xl bg-white border ${isExpanded ? 'border-navy-900 shadow-premium-hover ring-1 ring-navy-900/10' : 'border-slate-150 hover:border-slate-200'} overflow-hidden transition-all duration-300 shadow-premium`;
+                
+                eventCard.innerHTML = `
+                    <!-- Ponto de ancoragem na linha do tempo vertical -->
+                    <div class="absolute top-6 -left-[13px] w-2.5 h-2.5 rounded-full bg-white border-2 border-navy-900 z-10"></div>
+                    
+                    <!-- CABEÇALHO DO CARD (Sempre Visível) -->
+                    <div class="p-5 flex items-center justify-between gap-4 cursor-pointer select-none" onclick="toggleCard('${event.id}')">
+                        <div class="min-w-0 flex-grow">
+                            <!-- Data estilizada -->
+                            <div class="flex items-center gap-1.5 mb-1.5">
+                                <span class="font-display font-semibold text-[11px] text-navy-900 tracking-wider uppercase">
+                                    ${event.dateFormatted}
+                                </span>
+                            </div>
+                            <h3 class="font-display font-bold text-xs text-slate-900 leading-snug group-hover:text-navy-900 transition-colors">
+                                ${event.title}
+                            </h3>
+                        </div>
+
+                        <!-- Botões Rápidos de Ação e Download -->
+                        <div class="flex items-center gap-2 shrink-0" onclick="event.stopPropagation()">
+                            <!-- Descarregar PDF -->
+                            <button onclick="downloadMockFile('${event.id}', 'pdf')" class="w-9 h-9 rounded-xl bg-navy-50 hover:bg-navy-900 text-navy-900 hover:text-white flex items-center justify-center text-xs transition-all duration-200 active:scale-95 border border-navy-100 focus:outline-none" title="Descarregar PDF">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </button>
+                            <!-- Descarregar Ficheiro de Texto (Ofício) -->
+                            <button onclick="downloadMockFile('${event.id}', 'word')" class="w-9 h-9 rounded-xl bg-navy-50 hover:bg-navy-900 text-navy-900 hover:text-white flex items-center justify-center text-xs transition-all duration-200 active:scale-95 border border-navy-100 focus:outline-none" title="Descarregar Ofício">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </button>
+                            <!-- Chevron de Expansão -->
+                            <button onclick="toggleCard('${event.id}')" class="w-8 h-8 rounded-lg text-slate-400 hover:text-navy-900 flex items-center justify-center text-xs transition-transform duration-300 ${isExpanded ? 'rotate-180 text-navy-900' : ''}">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SECÇÃO DETALHADA DE EXPANSÃO -->
+                    <div class="transition-max-height overflow-hidden ${isExpanded ? 'max-h-[600px] border-t border-slate-100' : 'max-h-0'}" style="will-change: max-height;">
+                        <div class="p-5 bg-slate-50/50 flex flex-col gap-4 text-xs">
+                            
+                            <!-- AUTORIDADES (Bullets em novas linhas) -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm border-l-4 border-l-navy-900">
+                                <span class="text-[9px] uppercase tracking-widest text-slate-400 font-extrabold block mb-2">Autoridades</span>
+                                <ul class="space-y-1.5">
+                                    ${authoritiesList}
+                                </ul>
+                            </div>
+
+                            <!-- PROGRAMAÇÃO -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm border-l-4 border-l-militar-yellow">
+                                <span class="text-[9px] uppercase tracking-widest text-slate-400 font-extrabold block mb-2">Programação e Detalhes</span>
+                                <p class="text-slate-700 leading-relaxed text-xs font-medium">${event.details}</p>
+                            </div>
+
+                            <!-- ORGANIZAÇÕES MILITARES ENVOLVIDAS -->
+                            <div>
+                                <span class="text-[9px] uppercase tracking-widest text-slate-400 font-extrabold block mb-1.5">Organizações Subordinadas</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${omTags}
+                                </div>
+                            </div>
+
+                            <!-- BOTÃO PROGRAMA DE EVENTOS -->
+                            <button onclick="openProgramModal('${event.id}')" class="w-full py-3 bg-navy-900 hover:bg-navy-800 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm focus:outline-none">
+                                <i class="fa-solid fa-calendar-days text-militar-yellow"></i> Programa de Eventos
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(eventCard);
+            });
+        }
+
+        function toggleCard(id) {
+            if (openCardId === id) {
+                openCardId = null;
+            } else {
+                openCardId = id;
+            }
+            renderEvents();
+        }
+
+        // Gestão do Modal "Programa de Eventos"
+        function openProgramModal(eventId) {
+            const event = originalSchedule.find(e => e.id === eventId);
+            if (!event) return;
+            
+            selectedEventForModal = event;
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = `
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <span class="text-[9px] uppercase tracking-widest text-slate-400 font-extrabold block">Visita Oficial</span>
+                        <h4 class="font-display font-bold text-sm text-navy-900">${event.title}</h4>
+                        <p class="text-xs text-slate-600 mt-1 font-semibold">${event.dateFormatted}</p>
+                    </div>
+                    
+                    <div class="border-t border-slate-100 pt-3">
+                        <span class="text-[9px] uppercase tracking-widest text-slate-400 font-extrabold block mb-1">Autoridades Confirmadas</span>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            ${event.authorities.map(auth => `<span class="bg-navy-50 text-navy-900 font-bold px-2.5 py-1 rounded-lg border border-navy-100 text-[10px]">${auth}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-slate-100 pt-3">
+                        <span class="text-[9px] uppercase tracking-widest text-slate-400 font-extrabold block mb-1.5">Roteiro & Diretriz de Execução</span>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-slate-700 leading-relaxed text-xs">
+                            ${event.details}
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-slate-100 pt-3">
+                        <span class="text-[9px] uppercase tracking-widest text-slate-400 font-extrabold block">OM Coordenadoras</span>
+                        <p class="text-xs font-semibold text-slate-800 mt-1">${event.omInvolved.join(', ')}</p>
+                    </div>
+                </div>
+            `;
+            
+            toggleProgramModal();
+        }
+
+        function toggleProgramModal() {
+            const modal = document.getElementById('programModal');
+            const content = document.getElementById('programContent');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                }, 50);
+            } else {
+                modal.classList.add('opacity-0');
+                content.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // Copiar conteúdo estruturado do modal de programa de eventos
+        function copyModalContent() {
+            if (!selectedEventForModal) return;
+            
+            const textToCopy = `[MARINHA DO BRASIL - COM4DN]\n` +
+                               `PROGRAMA OFICIAL DE EVENTOS\n` +
+                               `Atividade: ${selectedEventForModal.title}\n` +
+                               `Data: ${selectedEventForModal.dateFormatted}\n` +
+                               `Autoridades: ${selectedEventForModal.authorities.join(', ')}\n` +
+                               `Diretrizes: ${selectedEventForModal.details}\n` +
+                               `OM de Apoio: ${selectedEventForModal.omInvolved.join(', ')}`;
+                               
+            const el = document.createElement('textarea');
+            el.value = textToCopy;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            showToast("Programa de Eventos copiado!");
+        }
+
+        function toggleSorting() {
+            ascendingOrder = !ascendingOrder;
+            
+            const label = document.getElementById('sortLabel');
+            const icon = document.getElementById('sortIcon');
+            
+            if (ascendingOrder) {
+                label.innerText = "Mais Próximos Primeiro";
+                icon.className = "fa-solid fa-arrow-down-short-wide text-militar-yellow";
+            } else {
+                label.innerText = "Mais Distantes Primeiro";
+                icon.className = "fa-solid fa-arrow-up-wide-short text-militar-yellow";
+            }
+            
+            renderEvents();
+            showToast("Cronograma reordenado com sucesso!");
+        }
+
+        function filterEvents() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            
+            schedule = originalSchedule.filter(event => {
+                return event.title.toLowerCase().includes(query) ||
+                       event.authorities.some(auth => auth.toLowerCase().includes(query)) ||
+                       event.omInvolved.some(om => om.toLowerCase().includes(query));
+            });
+            
+            renderEvents();
+        }
+
+        // Download Seguro de Diretrizes Oficiais (PDF / DOC) via browser
+        function downloadMockFile(eventId, format) {
+            const event = originalSchedule.find(e => e.id === eventId);
+            if (!event) return;
+
+            const separator = `========================================================\n`;
+            const header = `              MARINHA DO BRASIL - COM4DN\n` +
+                           `    DIRETRIZ OFICIAL DE VISITA E LOGÍSTICA DE COMITIVA\n` +
+                           `              PORTAL DA AMAZÓNIA - 2026\n`;
+            
+            const content = `ASSUNTO: PLANEJAMENTO E LOGÍSTICA - ${event.title.toUpperCase()}\n` +
+                            `DATA DA OPERAÇÃO: ${event.dateFormatted}\n` +
+                            `AUTORIDADES: ${event.authorities.join(", ")}\n\n` +
+                            `ORGANIZAÇÕES SUBORDINADAS ENVOLVIDAS:\n` +
+                            `${event.omInvolved.join(", ")}\n\n` +
+                            `CRONOGRAMA DE ATIVIDADES:\n` +
+                            `${event.details}\n\n` +
+                            `DOCUMENTO EMITIDO EM SESSÃO OFICIAL ELETRÓNICA DO COMANDO.\n` +
+                            `CONTROLE DE DIRETRIZES DA MARINHA DO BRASIL.`;
+
+            const rawText = separator + header + separator + "\n" + content;
+            
+            const element = document.createElement('a');
+            const fileExtension = format === 'pdf' ? 'pdf' : 'doc';
+            const fileName = `DIRETRIZ_${event.id}_${format}.${fileExtension}`;
+            
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(rawText));
+            element.setAttribute('download', fileName);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            
+            element.click();
+            document.body.removeChild(element);
+            
+            showToast(`Diretriz (.${format.toUpperCase()}) descarregada!`);
+        }
+
+        // Feedback visual discreto (Micro-Toast)
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = "flex items-center gap-2.5 px-4.5 py-3 bg-navy-900 border border-slate-700 rounded-xl shadow-xl text-xs text-white opacity-0 translate-y-2 transition-all duration-300 pointer-events-auto border-l-4 border-l-militar-yellow";
+            
+            toast.innerHTML = `
+                <i class="fa-solid fa-circle-check text-militar-yellow text-sm shrink-0"></i>
+                <span class="font-bold tracking-tight">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2');
+            }, 50);
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
